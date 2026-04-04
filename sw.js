@@ -1,4 +1,4 @@
-const CACHE_NAME = 'solaris-bunker-v3';
+const CACHE_NAME = 'solaris-bunker-v4';
 
 // Recursos Críticos para o Funcionamento Offline/Cache
 const STATIC_ASSETS = [
