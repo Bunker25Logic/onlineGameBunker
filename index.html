@@ -2,26 +2,18 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#39ff14" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Bunker 25 Logic - MMORPG</title>
     <link rel="manifest" href="manifest.json" />
     <link rel="icon" type="image/png" href="icon-512.png" />
     <link rel="apple-touch-icon" href="icon-512.png" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Share+Tech Mono&display=swap"
-      rel="stylesheet"
-    />
-    <script type="module" crossorigin src="assets/index-B82AIiwV.js"></script>
-    <link rel="stylesheet" crossorigin href="assets/index-DDNC9dnW.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Share+Tech Mono&display=swap" rel="stylesheet">
+    <script type="module" crossorigin src="./assets/index-DzpuPt2s.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CYyLFN8Y.css">
   </head>
   <body>
     <!-- Menu Principal Antes de Logar -->
@@ -33,10 +25,23 @@
       </div>
     </div>
 
+    <!-- TELA DE LOADING // Bunker25 Logic -->
+    <div id="loading-screen" style="display: none;">
+      <div class="loading-box">
+        <h1 class="game-title glow-pulse">INICIANDO MUNDO</h1>
+        <p id="loading-text">Estabelecendo conexão...</p>
+        <div class="progress-bar-container">
+          <div id="loading-progress" class="progress-bar-fill"></div>
+        </div>
+        <p id="loading-percent">0%</p>
+      </div>
+    </div>
+
     <!-- Jogo e Interface Base (Oculto no start) -->
-    <div id="game-container" style="display: none">
+    <div id="game-container" style="display: none;">
       <canvas id="game-canvas"></canvas>
       <div id="ui-layer"></div>
-    </div>
+      <div id="battle-transition" class="glitch-wipe"></div>
+    </div>
   </body>
 </html>

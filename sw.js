@@ -1,51 +1,60 @@
-const CACHE_NAME = 'bunker25-assets-v3';
-const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-512.png'
+const CACHE_NAME = 'solaris-bunker-v1';
+
+// Recursos Críticos para o Funcionamento Offline/Cache
+const STATIC_ASSETS = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-512.png',
+  // Os arquivos JS e CSS são cacheados dinamicamente pelo Vite, 
+  // mas aqui focamos em interceptar os modelos pesados
 ];
 
-// Instalação: Cacheia apenas o básico solicitado (Manifest, Ícone)
 self.addEventListener('install', (event) => {
-  self.skipWaiting(); // Força a atualização imediata
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('[SW] Pre-caching estático...');
+      return cache.addAll(STATIC_ASSETS);
+    })
   );
+  self.skipWaiting();
 });
 
-// Ativação: Limpa caches antigos
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
-      return Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)));
+      return Promise.all(
+        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+      );
     })
   );
+  self.clients.claim();
 });
 
-// Interceptação de Requests: Estratégia Seletiva // Bunker25 Logic
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // 1. Cache-First apenas para Imagens, Fontes e CSS estático (Assets)
-  const isAsset = url.pathname.match(/\.(png|jpg|jpeg|gif|svg|webp|css|woff2?|ttf)$/);
-  
-  // REGRA CRÍTICA: Não cachear scripts do /src/ nem APIs (conforme pedido)
-  const isCodeOrApi = url.pathname.includes('/src/') || url.hostname.includes('googleapis.com') || url.hostname.includes('firebase');
-
-  if (isAsset && !isCodeOrApi) {
+  // Estratégia: Cache First para Modelos 3D e Texturas (Arquivos Pesados)
+  if (url.pathname.includes('/assets/models/') || url.pathname.includes('/assets/textures/')) {
     event.respondWith(
-      caches.match(event.request).then((cached) => {
-        return cached || fetch(event.request).then((response) => {
+      caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) return cachedResponse;
+        
+        return fetch(event.request).then((networkResponse) => {
           return caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, response.clone());
-            return response;
+            cache.put(event.request, networkResponse.clone());
+            return networkResponse;
           });
         });
       })
     );
-  } else {
-    // 2. Network-Only para todo o resto (Scripts, APIs, etc)
-    event.respondWith(fetch(event.request));
+    return;
   }
+
+  // Estratégia: Network First para Lógica do Jogo (Garante que updates do código entrem)
+  event.respondWith(
+    fetch(event.request).catch(() => {
+      return caches.match(event.request);
+    })
+  );
 });
